@@ -150,6 +150,16 @@ suite('Workbench - Terminal Link Helpers', () => {
 				end: { x: 2, y: 4 }
 			});
 		});
+		test('should convert ranges for wrapped link with .', () => {
+			const lines = createBufferLineArray([
+				{ text: 'this/is/a/very/longggggggggggggggggggggggggggggggggggggggggggggggggggggggggg/link.html', width: 86 },
+			]);
+			const bufferRange = convertLinkRangeToBuffer(lines, 80, { startColumn: 1, startLineNumber: 1, endColumn: 86, endLineNumber: 1 }, 0);
+			assert.deepStrictEqual(bufferRange, {
+				start: { x: 1, y: 1 },
+				end: { x: 6, y: 2 }
+			});
+		});
 	});
 });
 

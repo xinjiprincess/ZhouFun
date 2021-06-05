@@ -160,4 +160,9 @@ suite('Workbench - TerminalValidatedLocalLinkProvider', () => {
 			{ range: [[7, 1], [11, 1]], text: './bar' }
 		]);
 	});
+	test('should support wrapped link', async () => {
+		await assertLink('this/is/a/very/longggggggggggggggggggggggggggggggggggggggggggggggggggggggggg/link.html', OperatingSystem.Linux, [
+			{ range: [[1, 1], [6, 2]], text: 'this/is/a/very/longggggggggggggggggggggggggggggggggggggggggggggggggggggggggg/link.html' },
+		]);
+	});
 });
