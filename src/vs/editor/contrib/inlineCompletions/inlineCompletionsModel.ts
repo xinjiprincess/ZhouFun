@@ -14,13 +14,14 @@ import { Position } from 'vs/editor/common/core/position';
 import { Range } from 'vs/editor/common/core/range';
 import { ITextModel } from 'vs/editor/common/model';
 import { InlineCompletion, InlineCompletionContext, InlineCompletions, InlineCompletionsProvider, InlineCompletionsProviderRegistry, InlineCompletionTriggerKind } from 'vs/editor/common/modes';
-import { BaseGhostTextWidgetModel, GhostText, GhostTextWidgetModel } from 'vs/editor/contrib/inlineCompletions/ghostTextWidget';
+import { BaseGhostTextWidgetModel, GhostText, GhostTextPart, GhostTextWidgetModel } from 'vs/editor/contrib/inlineCompletions/ghostTextWidget';
 import { EditOperation } from 'vs/editor/common/core/editOperation';
 import { ICommandService } from 'vs/platform/commands/common/commands';
 import { EditorOption } from 'vs/editor/common/config/editorOptions';
 import { MutableDisposable } from 'vs/editor/contrib/inlineCompletions/utils';
 import { RedoCommand, UndoCommand } from 'vs/editor/browser/editorExtensions';
 import { CoreEditingCommands } from 'vs/editor/browser/controller/coreCommands';
+import { stringDiff } from 'vs/base/common/diff/diff';
 
 export class InlineCompletionsModel extends Disposable implements GhostTextWidgetModel {
 	protected readonly onDidChangeEmitter = new Emitter<void>();
@@ -483,47 +484,42 @@ function leftTrim(str: string): string {
 }
 
 export function inlineCompletionToGhostText(inlineCompletion: NormalizedInlineCompletion, textModel: ITextModel): GhostText | undefined {
+	if (inlineCompletion.range.startLineNumber !== inlineCompletion.range.endLineNumber) {
+		// Only single line replacements are supported.
+		return undefined;
+	}
+
 	// This is a single line string
 	const valueToBeReplaced = textModel.getValueInRange(inlineCompletion.range);
 
-	let remainingInsertText: string;
+	const changes = stringDiff(valueToBeReplaced, inlineCompletion.text, false);
 
-	// Consider these cases
-	// valueToBeReplaced -> inlineCompletion.text
-	// "\t\tfoo" -> "\t\tfoobar" (+"bar")
-	// "\t" -> "\t\tfoobar" (+"\tfoobar")
-	// "\t\tfoo" -> "\t\t\tfoobar" (+"\t", +"bar")
-	// "\t\tfoo" -> "\tfoobar" (-"\t", +"\bar")
+	const lineNumber = inlineCompletion.range.startLineNumber;
 
-	const firstNonWsCol = textModel.getLineFirstNonWhitespaceColumn(inlineCompletion.range.startLineNumber);
+	const parts = new Array<GhostTextPart>();
+	let additionalLines = new Array<string>();
 
-	if (inlineCompletion.text.startsWith(valueToBeReplaced)) {
-		remainingInsertText = inlineCompletion.text.substr(valueToBeReplaced.length);
-	} else if (firstNonWsCol === 0 || inlineCompletion.range.startColumn < firstNonWsCol) {
-		// Only allow ignoring leading whitespace in indentation.
-		const valueToBeReplacedTrimmed = leftTrim(valueToBeReplaced);
-		const insertTextTrimmed = leftTrim(inlineCompletion.text);
-		if (!insertTextTrimmed.startsWith(valueToBeReplacedTrimmed)) {
+	for (const c of changes) {
+		if (c.originalLength > 0) {
 			return undefined;
 		}
-		remainingInsertText = insertTextTrimmed.substr(valueToBeReplacedTrimmed.length);
-	} else {
-		return undefined;
+		const column = inlineCompletion.range.startColumn + c.originalStart;
+		const text = inlineCompletion.text.substr(c.modifiedStart, c.modifiedLength);
+		const isEndOfLine = column === textModel.getLineMaxColumn(lineNumber);
+		if (!isEndOfLine) {
+			if (text.indexOf('\n') !== -1) {
+				// no line breaks inside the text
+				return undefined;
+			}
+			parts.push({ column, text });
+		} else {
+			const lines = strings.splitLines(text);
+			additionalLines = lines.slice(1);
+			parts.push({ column, text: lines[0] });
+		}
 	}
 
-	const position = inlineCompletion.range.getEndPosition();
-
-	const lines = strings.splitLines(remainingInsertText);
-
-	if (lines.length > 1 && textModel.getLineMaxColumn(position.lineNumber) !== position.column) {
-		// Such ghost text is not supported.
-		return undefined;
-	}
-
-	return {
-		lines,
-		position
-	};
+	return new GhostText(lineNumber, parts, additionalLines, 0);
 }
 
 export interface LiveInlineCompletion extends NormalizedInlineCompletion {

@@ -18,28 +18,35 @@ import sinon = require('sinon');
 
 suite('inlineCompletionToGhostText', () => {
 	function getOutput(text: string, suggestion: string): unknown {
-		const range = new Range(1, text.indexOf('[') + 1, 1, text.indexOf(']'));
+		const rangeStartOffset = text.indexOf('[');
+		const rangeEndOffset = text.indexOf(']') - 1;
 		const cleanedText = text.replace('[', '').replace(']', '');
 		const tempModel = createTextModel(cleanedText);
+		const range = Range.fromPositions(tempModel.getPositionAt(rangeStartOffset), tempModel.getPositionAt(rangeEndOffset));
+
 		const ghostText = inlineCompletionToGhostText({ text: suggestion, range }, tempModel);
 		if (!ghostText) {
 			return undefined;
 		}
+		const l = ghostText.lineNumber;
 
-		let str = cleanedText.substr(0, ghostText.position.column - 1);
-		let ghostStr = ghostText.lines.join('\n');
-		if (ghostStr.length > 0) {
-			str += `[${ghostStr}]`;
-		}
-		str += cleanedText.substr(ghostText.position.column - 1);
-
-		return str;
+		tempModel.applyEdits(
+			[
+				...ghostText.parts.map(p => ({ range: { startLineNumber: l, endLineNumber: l, startColumn: p.column, endColumn: p.column }, text: `[${p.text}]` })),
+				...(ghostText.additionalLines.length > 0 ? [{
+					range: { startLineNumber: l, endLineNumber: l, startColumn: tempModel.getLineMaxColumn(l), endColumn: tempModel.getLineMaxColumn(l) },
+					text: `{${ghostText.additionalLines.map(s => '\n' + s).join('')}}`
+				}] : [])
+			]
+		);
+		return tempModel.getValue();
 	}
 
 	test('Basic', () => {
 		assert.deepStrictEqual(getOutput('[foo]baz', 'foobar'), 'foo[bar]baz');
 		assert.deepStrictEqual(getOutput('[foo]baz', 'boobar'), undefined);
 		assert.deepStrictEqual(getOutput('[foo]foo', 'foofoo'), 'foo[foo]foo');
+		assert.deepStrictEqual(getOutput('foo[]', 'bar\nhello'), 'foo[bar]{\nhello}');
 	});
 
 	test('Empty ghost text', () => {
@@ -62,7 +69,11 @@ suite('inlineCompletionToGhostText', () => {
 	});
 
 	test('Other', () => {
-		assert.deepStrictEqual(getOutput('foo[()]', '(x);'), undefined);
+		assert.deepStrictEqual(getOutput('foo[()]', '(x);'), 'foo([x])[;]');
+	});
+
+	test('Unsupported cases', () => {
+		assert.deepStrictEqual(getOutput('foo[\n]', '\n'), undefined);
 	});
 });
 

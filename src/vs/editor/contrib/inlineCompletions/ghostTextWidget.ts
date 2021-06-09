@@ -35,9 +35,26 @@ export interface GhostTextWidgetModel {
 	readonly minReservedLineCount: number;
 }
 
-export interface GhostText {
-	readonly lines: string[];
-	readonly position: Position;
+export class GhostText {
+	constructor(
+		public readonly lineNumber: number,
+		public readonly parts: GhostTextPart[],
+		public readonly additionalLines: string[],
+		public readonly additionalReservedLineCount: number = 0
+	) {
+	}
+
+	public get isMultiLine(): boolean {
+		return this.additionalLines.length > 0;
+	}
+}
+
+export interface GhostTextPart {
+	/**
+	 * Single line text.
+	*/
+	readonly text: string;
+	readonly column: number;
 }
 
 export abstract class BaseGhostTextWidgetModel extends Disposable implements GhostTextWidgetModel {
