@@ -4,6 +4,10 @@ function Create-TmpJson($Obj) {
 	return $FileName
 }
 
+echo "ESRP_CLIENT_ID $env:ESRP_CLIENT_ID"
+echo "ESRPAuthCertificateSubjectName $env:ESRPAuthCertificateSubjectName"
+echo "ESRPCertificateSubjectName $env:ESRPCertificateSubjectName"
+
 $Auth = Create-TmpJson @{
 	Version = "1.0.0"
 	AuthenticationType = "AAD_CERT"
