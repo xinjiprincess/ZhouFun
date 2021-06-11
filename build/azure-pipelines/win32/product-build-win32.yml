@@ -244,8 +244,14 @@ steps:
     displayName: Download ESRPClient
     # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
+  - task: ESRPImportCertTask@1
+    displayName: Import ESRP Request Signing Certificate
+    inputs:
+      ESRP: "ESRP CodeSign"
+    condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+
   - powershell: |
-      .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPCertificateSubjectName
+      # .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPCertificateSubjectName
       .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-SSL-AADAuth) ESRPAuthCertificateSubjectName
     displayName: Import ESRP Certificates
     # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))

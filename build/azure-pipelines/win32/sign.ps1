@@ -5,6 +5,7 @@ function Create-TmpJson($Obj) {
 }
 
 echo "ESRP_CLIENT_ID $env:ESRP_CLIENT_ID"
+echo "ESRPClientId $env:ESRPClientId"
 echo "ESRPAuthCertificateSubjectName $env:ESRPAuthCertificateSubjectName"
 echo "ESRPCertificateSubjectName $env:ESRPCertificateSubjectName"
 
