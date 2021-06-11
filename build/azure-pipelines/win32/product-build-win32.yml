@@ -248,7 +248,7 @@ steps:
     displayName: Import ESRP Request Signing Certificate
     inputs:
       ESRP: "ESRP CodeSign"
-    condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+    # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
   - powershell: |
       # .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPCertificateSubjectName
