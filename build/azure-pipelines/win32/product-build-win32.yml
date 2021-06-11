@@ -240,26 +240,32 @@ steps:
   #       ]
   #     SessionTimeout: 120
   #   condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+
+  # This is here just so the esrpcli tool is downloaded
   - task: EsrpClientTool@1
     displayName: Download ESRPClient
-    # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
-
-  - task: ESRPImportCertTask@1
-    displayName: Import ESRP Request Signing Certificate
-    inputs:
-      ESRP: "ESRP CodeSign"
-    # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+  #   # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
   - powershell: |
-      # .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPCertificateSubjectName
-      .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-SSL-AADAuth) ESRPAuthCertificateSubjectName
-    displayName: Import ESRP Certificates
-    # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+    $ESRP = (Get-ChildItem $(Agent.ToolsDirectory) -Recurse -Filter esrpcli.exe | Select-Object -last 1).PSPath
+    & $ESRP
 
-  - powershell: |
-      .\build\azure-pipelines\win32\sign.ps1 .\build\win32\inno_updater.exe
-    displayName: Sign something
-    # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+  # - task: ESRPImportCertTask@1
+  #   displayName: Import ESRP Request Signing Certificate
+  #   inputs:
+  #     ESRP: "ESRP CodeSign"
+  #   # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+
+  # - powershell: |
+  #     # .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPCertificateSubjectName
+  #     .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-SSL-AADAuth) ESRPAuthCertificateSubjectName
+  #   displayName: Import ESRP Certificates
+  #   # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+
+  # - powershell: |
+  #     .\build\azure-pipelines\win32\sign.ps1 .\build\win32\inno_updater.exe
+  #   displayName: Sign something
+  #   # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
   # - powershell: |
   #     . build/azure-pipelines/win32/exec.ps1
