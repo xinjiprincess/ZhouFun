@@ -247,13 +247,13 @@ steps:
   #   # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
   - powershell: |
-      $EsrpClientTool = (Get-ChildItem $(Agent.RootDirectory)\_tasks -Directory -Filter EsrpClientTool_* | Select-Object -last 1).FullName
+      $EsrpClientTool = (Get-ChildItem -Path $(Agent.RootDirectory)\_tasks -Directory -Filter EsrpClientTool_* | Select-Object -last 1).FullName
       echo $EsrpClientTool
 
-      Get-ChildItem $EsrpClientTool
-      Get-ChildItem $EsrpClientTool -Recurse -Filter esrpcli.exe
+      Get-ChildItem -Path $EsrpClientTool
+      Get-ChildItem -Path $EsrpClientTool -Recurse -Filter esrpcli.exe
 
-      $ESRP = (Get-ChildItem $EsrpClientTool -Recurse -Filter esrpcli.exe | Select-Object -last 1).FullName
+      $ESRP = (Get-ChildItem -Path $EsrpClientTool -Recurse -Filter esrpcli.exe | Select-Object -last 1).FullName
       echo $ESRP
       # & $ESRP
 
