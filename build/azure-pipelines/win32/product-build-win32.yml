@@ -251,9 +251,9 @@ steps:
       echo $EsrpClientTool
 
       Get-ChildItem $EsrpClientTool
-      Get-ChildItem $EsrpClientTool -Recurse -File -Filter esrpcli.exe
+      Get-ChildItem $EsrpClientTool -Recurse -Filter esrpcli.exe
 
-      $ESRP = (Get-ChildItem $EsrpClientTool -Recurse -File -Filter esrpcli.exe | Select-Object -last 1).FullName
+      $ESRP = (Get-ChildItem $EsrpClientTool -Recurse -Filter esrpcli.exe | Select-Object -last 1).FullName
       echo $ESRP
       # & $ESRP
 
