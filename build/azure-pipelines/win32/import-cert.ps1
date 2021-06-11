@@ -1,4 +1,4 @@
-param ($CertBase64)
+param ($CertBase64,$VariableName)
 $ErrorActionPreference = "Stop"
 
 $CertBytes = [System.Convert]::FromBase64String($CertBase64)
@@ -10,5 +10,5 @@ $CertStore.Open("ReadWrite")
 $CertStore.AddRange($CertCollection)
 $CertStore.Close()
 
-$ESRPAuthCertificateSubjectName = $CertCollection[0].Subject
-Write-Output ("##vso[task.setvariable variable=ESRPAuthCertificateSubjectName;]$ESRPAuthCertificateSubjectName")
+$SubjectName = $CertCollection[0].Subject
+Write-Output ("##vso[task.setvariable variable=$VariableName;]$SubjectName")
