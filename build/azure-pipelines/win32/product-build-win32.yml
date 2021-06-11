@@ -254,11 +254,12 @@ steps:
   #   inputs:
   #     ESRP: "ESRP CodeSign"
   #   condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
-  - task: PowerShell@2
-    inputs:
-      targetType: filePath
-      filePath: .\build\azure-pipelines\win32\import-cert.ps1
-      arguments: "$(ESRP-SSL-AADAuth) ESRPAuthCertificateSubjectName"
+  - powershell: |
+      . build/azure-pipelines/win32/exec.ps1
+      $ErrorActionPreference = "Stop"
+
+      .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPPKICertificateSubjectName
+      .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-SSL-AADAuth) ESRPAuthCertificateSubjectName
     displayName: Import ESRP Auth Certificate
     # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
