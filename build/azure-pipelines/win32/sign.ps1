@@ -7,7 +7,7 @@ function Create-TmpJson($Obj) {
 $Auth = Create-TmpJson @{
 	Version = "1.0.0"
 	AuthenticationType = "AAD_CERT"
-	ClientId = $env:ESRPClientId
+	ClientId = $env:ESRP_CLIENT_ID
 	AuthCert = @{
 		SubjectName = $env:ESRPAuthCertificateSubjectName
 		StoreLocation = "LocalMachine"
@@ -68,4 +68,4 @@ $Input = Create-TmpJson @{
 
 $Output = [System.IO.Path]::GetTempFileName()
 $ScriptPath = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-& "$ScriptPath\ESRPClient\packages\Microsoft.ESRPClient.*\tools\ESRPClient.exe" Sign -a $Auth -p $Policy -i $Input -o $Output
+& "esrpclient.exe" Sign -a $Auth -p $Policy -i $Input -o $Output

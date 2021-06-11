@@ -240,34 +240,24 @@ steps:
   #       ]
   #     SessionTimeout: 120
   #   condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
-  # - task: NuGetCommand@2
-  #   displayName: Install ESRPClient.exe
-  #   inputs:
-  #     restoreSolution: 'build\azure-pipelines\win32\ESRPClient\packages.config'
-  #     feedsToUse: config
-  #     nugetConfigPath: 'build\azure-pipelines\win32\ESRPClient\NuGet.config'
-  #     externalFeedCredentials: "ESRP Nuget"
-  #     restoreDirectory: packages
-  #   condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
-  # - task: ESRPImportCertTask@1
-  #   displayName: Import ESRP Request Signing Certificate
-  #   inputs:
-  #     ESRP: "ESRP CodeSign"
-  #   condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+  - task: EsrpClientTool@1
+    displayName: Download ESRPClient
+    # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
+
   - powershell: |
       . build/azure-pipelines/win32/exec.ps1
       $ErrorActionPreference = "Stop"
-      .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPPKICertificateSubjectName
-      .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-SSL-AADAuth) ESRPAuthCertificateSubjectName
+      exec { .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPCertificateSubjectName }
+      exec { .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-SSL-AADAuth) ESRPAuthCertificateSubjectName }
     displayName: Import ESRP Certificates
     # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
-  - task: EsrpClientTool@1
-    displayName: Download ESRPClient
-
   - powershell: |
-      echo $(esrpclient.toolpath)
-      echo $(esrpclient.toolname)
+      . build/azure-pipelines/win32/exec.ps1
+      $ErrorActionPreference = "Stop"
+      exec { .\build\azure-pipelines\win32\sign.ps1 .\build\win32\inno_updater.exe }
+    displayName: Sign something
+    # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
   # - powershell: |
   #     . build/azure-pipelines/win32/exec.ps1
