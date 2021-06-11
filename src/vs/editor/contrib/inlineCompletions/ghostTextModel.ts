@@ -18,21 +18,26 @@ export abstract class DelegatingModel extends Disposable implements GhostTextWid
 	private readonly onDidChangeEmitter = new Emitter<void>();
 	public readonly onDidChange = this.onDidChangeEmitter.event;
 
+	private cachedGhostText: GhostText | undefined;
+
 	private readonly currentModelRef = this._register(new MutableDisposable<IReference<GhostTextWidgetModel>>());
 	protected get targetModel(): GhostTextWidgetModel | undefined {
 		return this.currentModelRef.value?.object;
 	}
 
 	protected setTargetModel(model: GhostTextWidgetModel | undefined): void {
+		this.currentModelRef.clear();
 		this.currentModelRef.value = model ? createDisposableRef(model, model.onDidChange(() => {
+			this.cachedGhostText = model?.ghostText;
 			this.onDidChangeEmitter.fire();
 		})) : undefined;
 
+		this.cachedGhostText = model?.ghostText;
 		this.onDidChangeEmitter.fire();
 	}
 
 	public get ghostText(): GhostText | undefined {
-		return this.targetModel?.ghostText;
+		return this.cachedGhostText;
 	}
 
 	public setExpanded(expanded: boolean): void {
