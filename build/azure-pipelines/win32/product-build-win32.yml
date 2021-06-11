@@ -245,17 +245,13 @@ steps:
     # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
   - powershell: |
-      . build/azure-pipelines/win32/exec.ps1
-      $ErrorActionPreference = "Stop"
-      exec { .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPCertificateSubjectName }
-      exec { .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-SSL-AADAuth) ESRPAuthCertificateSubjectName }
+      .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPCertificateSubjectName
+      .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-SSL-AADAuth) ESRPAuthCertificateSubjectName
     displayName: Import ESRP Certificates
     # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
   - powershell: |
-      . build/azure-pipelines/win32/exec.ps1
-      $ErrorActionPreference = "Stop"
-      exec { .\build\azure-pipelines\win32\sign.ps1 .\build\win32\inno_updater.exe }
+      .\build\azure-pipelines\win32\sign.ps1 .\build\win32\inno_updater.exe
     displayName: Sign something
     # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
