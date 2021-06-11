@@ -263,6 +263,9 @@ steps:
     displayName: Import ESRP Auth Certificate
     # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
+  - task: EsrpClientTool@1
+    displayName: Download ESRPClient
+
   # - powershell: |
   #     . build/azure-pipelines/win32/exec.ps1
   #     $ErrorActionPreference = "Stop"
