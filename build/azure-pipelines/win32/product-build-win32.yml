@@ -257,14 +257,17 @@ steps:
   - powershell: |
       . build/azure-pipelines/win32/exec.ps1
       $ErrorActionPreference = "Stop"
-
       .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-PKI) ESRPPKICertificateSubjectName
       .\build\azure-pipelines\win32\import-cert.ps1 $(ESRP-SSL-AADAuth) ESRPAuthCertificateSubjectName
-    displayName: Import ESRP Auth Certificate
+    displayName: Import ESRP Certificates
     # condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
 
   - task: EsrpClientTool@1
     displayName: Download ESRPClient
+
+  - powershell: |
+      echo $(esrpclient.toolpath)
+      echo $(esrpclient.toolname)
 
   # - powershell: |
   #     . build/azure-pipelines/win32/exec.ps1
