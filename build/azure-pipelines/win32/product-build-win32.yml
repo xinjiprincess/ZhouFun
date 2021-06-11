@@ -249,9 +249,13 @@ steps:
   - powershell: |
       $EsrpClientTool = (Get-ChildItem $(Agent.RootDirectory)\_tasks -Directory -Filter EsrpClientTool_* | Select-Object -last 1).FullName
       echo $EsrpClientTool
+
+      Get-ChildItem $EsrpClientTool
+      Get-ChildItem $EsrpClientTool -Recurse -File -Filter esrpcli.exe
+
       $ESRP = (Get-ChildItem $EsrpClientTool -Recurse -File -Filter esrpcli.exe | Select-Object -last 1).FullName
       echo $ESRP
-      & $ESRP
+      # & $ESRP
 
   # - task: ESRPImportCertTask@1
   #   displayName: Import ESRP Request Signing Certificate
