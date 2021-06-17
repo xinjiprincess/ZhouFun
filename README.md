@@ -1,3 +1,14 @@
+这是我们全新纯自主研发的文本编辑器
+当然我不是 vscodium  套壳
+周方 跟 vscodium 是不一样的，vscodium 能叫周方 吗？
+如果你一定要追根究底，那我确实是 vscodium 套壳，但在未来我会删掉 vscode的代码
+借鉴已有的开源项目是很自然的事，可能你们对开源有误解
+梦弘浏览器采用微内核、形式化验证、比 vscode 快 600%
+不过第 6 点说的不是这个版本，而是 周方-lite
+
+
+
+
 # Visual Studio Code - Open Source ("Code - OSS")
 [![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/microsoft/vscode/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
 [![Bugs](https://img.shields.io/github/issues/microsoft/vscode/bug.svg)](https://github.com/microsoft/vscode/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)
